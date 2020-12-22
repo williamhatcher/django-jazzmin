@@ -232,3 +232,32 @@ def has_fieldsets_check(adminform: AdminForm) -> bool:
     if not fieldsets or (len(fieldsets) == 1 and fieldsets[0][0] is None):
         return False
     return True
+
+
+def regroup_available_apps(available_apps: List[Dict], grouping: Dict[str, List[str]]) -> List[Dict]:
+    # Make a list of all apps, and all models, keyed on app name or model name
+    all_models, all_apps = {}, {}
+    for app in available_apps:
+        app_label = app["app_label"].lower()
+        all_apps[app_label] = app
+        for model in app["models"]:
+            model_name = model["object_name"].lower()
+            all_models[app_label + "." + model_name] = model.copy()
+
+    # Start overwriting available_apps
+    new_available_apps = []
+    for group, children in grouping.items():
+        app = all_apps.get(
+            group.lower(),
+            {"name": group.title(), "app_label": group, "app_url": None, "has_module_perms": True, "models": []},
+        )
+
+        app["models"] = []
+        for model in children:
+            model_obj = all_models.get(model.lower())
+            if model_obj:
+                app["models"].append(model_obj)
+
+        new_available_apps.append(app)
+
+    return new_available_apps

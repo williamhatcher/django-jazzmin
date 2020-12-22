@@ -31,6 +31,7 @@ from ..utils import (
     get_admin_url,
     make_menu,
     has_fieldsets_check,
+    regroup_available_apps,
 )
 
 User = get_user_model()
@@ -49,17 +50,21 @@ def get_side_menu(context: Context, using: str = "available_apps") -> List[Dict]
     if not user:
         return []
 
+    menu = []
     options = get_settings()
     ordering = options.get("order_with_respect_to", [])
     ordering = [x.lower() for x in ordering]
 
-    menu = []
     available_apps = copy.deepcopy(context.get(using, []))
 
     custom_links = {
         app_name: make_menu(user, links, options, allow_appmenus=False)
         for app_name, links in options.get("custom_links", {}).items()
     }
+
+    # If we are using custom grouping, overwrite available_apps based on our grouping
+    if options.get("custom_menu") and options["custom_menu"]:
+        available_apps = regroup_available_apps(available_apps, options["custom_menu"])
 
     for app in available_apps:
         app_label = app["app_label"].lower()
@@ -83,18 +88,13 @@ def get_side_menu(context: Context, using: str = "available_apps") -> List[Dict]
 
         custom_link_names = [x.get("name", "").lower() for x in app_custom_links]
         model_ordering = list(
-            filter(
-                lambda x: x.lower().startswith("{}.".format(app_label)) or x.lower() in custom_link_names,
-                ordering,
-            )
+            filter(lambda x: x.lower().startswith("{}.".format(app_label)) or x.lower() in custom_link_names, ordering,)
         )
 
         if len(menu_items):
             if model_ordering:
                 menu_items = order_with_respect_to(
-                    menu_items,
-                    model_ordering,
-                    getter=lambda x: x.get("model_str", x.get("name", "").lower()),
+                    menu_items, model_ordering, getter=lambda x: x.get("model_str", x.get("name", "").lower()),
                 )
             app["models"] = menu_items
             menu.append(app)
@@ -420,8 +420,7 @@ def action_message_to_list(action: LogEntry) -> List[Dict]:
 
             elif "changed" in sub_message:
                 sub_message["changed"]["fields"] = get_text_list(
-                    [gettext(field_name) for field_name in sub_message["changed"]["fields"]],
-                    gettext("and"),
+                    [gettext(field_name) for field_name in sub_message["changed"]["fields"]], gettext("and"),
                 )
                 if "name" in sub_message["changed"]:
                     sub_message["changed"]["name"] = gettext(sub_message["changed"]["name"])

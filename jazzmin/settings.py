@@ -50,6 +50,8 @@ DEFAULT_SETTINGS = {
     "order_with_respect_to": [],
     # Custom links to append to side menu app groups, keyed on app name
     "custom_links": {},
+    # Do not generate a menu based off of installed apps, instead, manually craft one using this app -> model mapping
+    "custom_menu": {},
     # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free
     # for a list of icon classes
     "icons": {"auth": "fas fa-users-cog", "auth.user": "fas fa-user", "auth.Group": "fas fa-users"},
