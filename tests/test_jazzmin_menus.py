@@ -1,6 +1,5 @@
 import pytest
 from django.contrib.admin import site
-from django.template import Context
 from django.urls import reverse
 
 from jazzmin.templatetags.jazzmin import get_side_menu
@@ -24,10 +23,21 @@ def test_side_menu(admin_client, settings):
 
     assert parse_sidemenu(response) == {
         "Administration": ["/en/admin/admin/logentry/"],
-        "Authentication and Authorization": ["/en/admin/auth/group/", "/en/admin/auth/user/",],
-        "Books": ["/en/admin/books/author/", "/en/admin/books/book/", "/en/admin/books/genre/",],
+        "Authentication and Authorization": [
+            "/en/admin/auth/group/",
+            "/en/admin/auth/user/",
+        ],
+        "Books": [
+            "/en/admin/books/author/",
+            "/en/admin/books/book/",
+            "/en/admin/books/genre/",
+        ],
         "Global": ["/en/admin/"],
-        "Loans": ["/make_messages/", "/en/admin/loans/bookloan/", "/en/admin/loans/library/",],
+        "Loans": [
+            "/make_messages/",
+            "/en/admin/loans/bookloan/",
+            "/en/admin/loans/library/",
+        ],
     }
 
     settings.JAZZMIN_SETTINGS = override_jazzmin_settings(hide_models=["auth.user"])
@@ -36,8 +46,16 @@ def test_side_menu(admin_client, settings):
     assert parse_sidemenu(response) == {
         "Global": ["/en/admin/"],
         "Authentication and Authorization": ["/en/admin/auth/group/"],
-        "Books": ["/en/admin/books/author/", "/en/admin/books/book/", "/en/admin/books/genre/",],
-        "Loans": ["/make_messages/", "/en/admin/loans/bookloan/", "/en/admin/loans/library/",],
+        "Books": [
+            "/en/admin/books/author/",
+            "/en/admin/books/book/",
+            "/en/admin/books/genre/",
+        ],
+        "Loans": [
+            "/make_messages/",
+            "/en/admin/loans/bookloan/",
+            "/en/admin/loans/library/",
+        ],
         "Administration": ["/en/admin/admin/logentry/"],
     }
 
@@ -87,7 +105,11 @@ def test_top_menu(admin_client, settings):
     settings.JAZZMIN_SETTINGS = override_jazzmin_settings(
         topmenu_links=[
             {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-            {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True,},
+            {
+                "name": "Support",
+                "url": "https://github.com/farridav/django-jazzmin/issues",
+                "new_window": True,
+            },
             {"model": "auth.User"},
             {"app": "books"},
         ]
@@ -97,7 +119,10 @@ def test_top_menu(admin_client, settings):
 
     assert parse_topmenu(response) == [
         {"name": "Home", "link": "/en/admin/"},
-        {"name": "Support", "link": "https://github.com/farridav/django-jazzmin/issues",},
+        {
+            "name": "Support",
+            "link": "https://github.com/farridav/django-jazzmin/issues",
+        },
         {"name": "Users", "link": "/en/admin/auth/user/"},
         {
             "name": "Books",
@@ -139,12 +164,71 @@ def test_user_menu(admin_user, client, settings):
     ]
 
 
-def test_custom_menu_grouping(settings, rf):
-    context = site.each_context(rf)
+def test_custom_menu_grouping(admin_user, settings, rf):
+    """
+    When we use a custom menu we get exactly what we ask for
+    """
+    request = rf.request()
+    request.user = admin_user
+    context = site.each_context(request)
+    context.update({"user": admin_user})
+
     settings.JAZZMIN_SETTINGS = override_jazzmin_settings(
         custom_menu={"auth": ["books.book"], "arbitrary name": ["auth.user", "auth.group"]}
     )
 
     menu = get_side_menu(context)
 
-    assert menu == []
+    assert menu == [
+        {
+            "app_label": "auth",
+            "app_url": "/en/admin/auth/",
+            "has_module_perms": True,
+            "icon": "fas fa-users-cog",
+            "models": [
+                {
+                    "add_url": "/en/admin/books/book/add/",
+                    "admin_url": "/en/admin/books/book/",
+                    "icon": "fas fa-circle",
+                    "model_str": "auth.book",
+                    "name": "Books",
+                    "object_name": "Book",
+                    "perms": {"add": True, "change": True, "delete": True, "view": True},
+                    "url": "/en/admin/books/book/",
+                    "view_only": False,
+                }
+            ],
+            "name": "Authentication and Authorization",
+        },
+        {
+            "app_label": "arbitrary name",
+            "app_url": None,
+            "has_module_perms": True,
+            "icon": "fas fa-chevron-circle-right",
+            "models": [
+                {
+                    "add_url": "/en/admin/auth/user/add/",
+                    "admin_url": "/en/admin/auth/user/",
+                    "icon": "fas fa-circle",
+                    "model_str": "arbitrary name.user",
+                    "name": "Users",
+                    "object_name": "User",
+                    "perms": {"add": True, "change": True, "delete": True, "view": True},
+                    "url": "/en/admin/auth/user/",
+                    "view_only": False,
+                },
+                {
+                    "add_url": "/en/admin/auth/group/add/",
+                    "admin_url": "/en/admin/auth/group/",
+                    "icon": "fas fa-circle",
+                    "model_str": "arbitrary name.group",
+                    "name": "Groups",
+                    "object_name": "Group",
+                    "perms": {"add": True, "change": True, "delete": True, "view": True},
+                    "url": "/en/admin/auth/group/",
+                    "view_only": False,
+                },
+            ],
+            "name": "Arbitrary Name",
+        },
+    ]

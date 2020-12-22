@@ -150,7 +150,16 @@ def get_view_permissions(user: AbstractUser) -> Set[str]:
     lower_perms = []
     for perm in perms:
         app, perm_codename = perm.split(".")
+<<<<<<< HEAD
         lower_perms.append("{app}.{perm_codename}".format(app=app, perm_codename=perm_codename.lower()))
+=======
+        lower_perms.append(
+            "{app}.{perm_codename}".format(
+                app=app,
+                perm_codename=perm_codename.lower(),
+            )
+        )
+>>>>>>> 3ec6d11 (test)
     return {x.replace("view_", "") for x in lower_perms if "view" in x or "change" in x}
 
 
@@ -208,7 +217,15 @@ def make_menu(
         # App links
         elif "app" in link and allow_appmenus:
             children = [
+<<<<<<< HEAD
                 {"name": child.get("verbose_name", child["name"]), "url": child["url"], "children": None}
+=======
+                {
+                    "name": child.get("verbose_name", child["name"]),
+                    "url": child["url"],
+                    "children": None,
+                }
+>>>>>>> 3ec6d11 (test)
                 for child in get_app_admin_urls(link["app"], admin_site=admin_site)
                 if child["model"] in model_permissions
             ]
