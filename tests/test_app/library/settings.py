@@ -71,25 +71,15 @@ TEMPLATES = [
 
 DATABASES = {
     "default": dj_database_url.config(
-        env="DATABASE_URL",
-        conn_max_age=500,
-        default="sqlite:///{}".format(os.path.join(BASE_DIR, "db.sqlite3")),
+        env="DATABASE_URL", conn_max_age=500, default="sqlite:///{}".format(os.path.join(BASE_DIR, "db.sqlite3")),
     )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 LANGUAGE_CODE = "en"
@@ -142,12 +132,13 @@ JAZZMIN_SETTINGS = {
     # Links to put along the top menu
     "topmenu_links": [
         # Url that gets reversed (Permissions can be added)
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"], "icon": "fas fa-home"},
         # external url that opens in a new window (Permissions can be added)
         {
             "name": "Support",
             "url": "https://github.com/farridav/django-jazzmin/issues",
             "new_window": True,
+            "icon": "fas fa-cog",
         },
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
@@ -155,16 +146,13 @@ JAZZMIN_SETTINGS = {
         {"app": "books"},
         {"app": "loans"},
     ],
+    "topmenu_icons": True,
     #############
     # User Menu #
     #############
     # Additional links to include in the user menu on the top right ('app' url type is not allowed)
     "usermenu_links": [
-        {
-            "name": "Support",
-            "url": "https://github.com/farridav/django-jazzmin/issues",
-            "new_window": True,
-        },
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
         {"model": "auth.user"},
     ],
     #############
@@ -200,9 +188,11 @@ JAZZMIN_SETTINGS = {
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
         "admin.LogEntry": "fas fa-file",
+        "books": "fas fa-book",
         "books.Author": "fas fa-user",
         "books.Book": "fas fa-book",
         "books.Genre": "fas fa-photo-video",
+        "loans": "fas fa-book-open",
         "loans.BookLoan": "fas fa-book-open",
         "loans.Library": "fas fa-book-reader",
     },

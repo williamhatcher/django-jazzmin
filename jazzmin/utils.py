@@ -192,7 +192,7 @@ def make_menu(
                     "url": get_custom_url(link["url"], admin_site=admin_site),
                     "children": None,
                     "new_window": link.get("new_window", False),
-                    "icon": link.get("icon", options["default_icon_children"]),
+                    "icon": link.get("icon"),
                 }
             )
 
@@ -210,7 +210,7 @@ def make_menu(
                     "url": get_admin_url(link["model"], admin_site=admin_site),
                     "children": [],
                     "new_window": link.get("new_window", False),
-                    "icon": options["icons"].get(link["model"], options["default_icon_children"]),
+                    "icon": options["icons"].get(link["model"].lower()),
                 }
             )
 
@@ -224,6 +224,7 @@ def make_menu(
                     "name": child.get("verbose_name", child["name"]),
                     "url": child["url"],
                     "children": None,
+                    "icon": options["icons"].get(child["model"].lower()),
                 }
 >>>>>>> 3ec6d11 (test)
                 for child in get_app_admin_urls(link["app"], admin_site=admin_site)
@@ -237,7 +238,7 @@ def make_menu(
                     "name": getattr(apps.app_configs[link["app"]], "verbose_name", link["app"]).title(),
                     "url": "#",
                     "children": children,
-                    "icon": options["icons"].get(link["app"], options["default_icon_children"]),
+                    "icon": options["icons"].get(link["app"].lower()),
                 }
             )
 
