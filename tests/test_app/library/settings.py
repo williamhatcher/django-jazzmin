@@ -71,15 +71,25 @@ TEMPLATES = [
 
 DATABASES = {
     "default": dj_database_url.config(
-        env="DATABASE_URL", conn_max_age=500, default="sqlite:///{}".format(os.path.join(BASE_DIR, "db.sqlite3")),
+        env="DATABASE_URL",
+        conn_max_age=500,
+        default="sqlite:///{}".format(os.path.join(BASE_DIR, "db.sqlite3")),
     )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 LANGUAGE_CODE = "en"
@@ -146,6 +156,7 @@ JAZZMIN_SETTINGS = {
         {"app": "books"},
         {"app": "loans"},
     ],
+    # Whether or not we use icons on the top menu
     "topmenu_icons": True,
     #############
     # User Menu #
@@ -179,7 +190,7 @@ JAZZMIN_SETTINGS = {
             }
         ]
     },
-    # Dont generate a menu based off installed apps, instead, craft one using this app/arbitrary name -> model mapping
+    # Dont generate a side menu from installed apps, instead, craft one using this app/arbitrary name -> model mapping
     "custom_menu": {},
     # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free
     # for a list of icon classes

@@ -1,12 +1,12 @@
 import logging
-from typing import List, Union, Dict, Set, Callable
+from typing import List, Union, Dict, Set, Callable, Any
 from urllib.parse import urlencode
 
 from django.apps import apps
 from django.contrib.admin import ListFilter
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.auth.models import AbstractUser
-from django.db.models.base import ModelBase
+from django.db.models.base import ModelBase, Model
 from django.db.models.options import Options
 from django.utils.translation import gettext
 
@@ -33,16 +33,13 @@ def order_with_respect_to(original: List, reference: List, getter: Callable = la
     return [y for x, y in sorted(zip(ranking, original), key=lambda x: x[0])]
 
 
-def get_admin_url(
-    instance: Union[str, ModelBase], admin_site: str = "admin", from_app: bool = False, **kwargs: str
-) -> str:
+def get_admin_url(instance: Any, admin_site: str = "admin", from_app: bool = False, **kwargs: str) -> str:
     """
     Return the admin URL for the given instance, model class or <app>.<model> string
     """
     url = "#"
 
     try:
-
         if type(instance) == str:
             app_label, model_name = instance.split(".")
             model_name = model_name.lower()
@@ -150,16 +147,7 @@ def get_view_permissions(user: AbstractUser) -> Set[str]:
     lower_perms = []
     for perm in perms:
         app, perm_codename = perm.split(".")
-<<<<<<< HEAD
         lower_perms.append("{app}.{perm_codename}".format(app=app, perm_codename=perm_codename.lower()))
-=======
-        lower_perms.append(
-            "{app}.{perm_codename}".format(
-                app=app,
-                perm_codename=perm_codename.lower(),
-            )
-        )
->>>>>>> 3ec6d11 (test)
     return {x.replace("view_", "") for x in lower_perms if "view" in x or "change" in x}
 
 
@@ -176,12 +164,7 @@ def make_menu(
 
     menu = []
     for link in links:
-
-        perm_matches = []
-        for perm in link.get("permissions", []):
-            perm_matches.append(user.has_perm(perm))
-
-        if not all(perm_matches):
+        if not all([user.has_perm(perm) for perm in link.get("permissions", [])]):
             continue
 
         # Url links
@@ -217,16 +200,7 @@ def make_menu(
         # App links
         elif "app" in link and allow_appmenus:
             children = [
-<<<<<<< HEAD
                 {"name": child.get("verbose_name", child["name"]), "url": child["url"], "children": None}
-=======
-                {
-                    "name": child.get("verbose_name", child["name"]),
-                    "url": child["url"],
-                    "children": None,
-                    "icon": options["icons"].get(child["model"].lower()),
-                }
->>>>>>> 3ec6d11 (test)
                 for child in get_app_admin_urls(link["app"], admin_site=admin_site)
                 if child["model"] in model_permissions
             ]
@@ -252,7 +226,7 @@ def has_fieldsets_check(adminform: AdminForm) -> bool:
     return True
 
 
-def regroup_available_apps(available_apps: List[Dict], grouping: Dict[str, List[str]]) -> List[Dict]:
+def regroup_apps(available_apps: List[Dict], grouping: Dict[str, List[str]]) -> List[Dict]:
     # Make a list of all apps, and all models, keyed on app name or model name
     all_models, all_apps = {}, {}
     for app in available_apps:

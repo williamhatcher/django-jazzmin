@@ -30,6 +30,8 @@ DEFAULT_SETTINGS = {
     ############
     # Links to put along the nav bar
     "topmenu_links": [],
+    # Whether or not we use icons on the top menu
+    "topmenu_icons": False,
     #############
     # User Menu #
     #############
